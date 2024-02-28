@@ -1,6 +1,7 @@
 package me.bossanovadanilo.imc
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -45,6 +47,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+
 import me.bossanovadanilo.imc.ui.theme.IMCTheme
 
 class MainActivity : ComponentActivity() {
@@ -76,12 +79,16 @@ fun ImcScreen() {
         mutableStateOf("")
     }
 
-    var imc = remember {
-        mutableStateOf("")
+    var imc =  remember {
+        mutableStateOf(0.0)
     }
 
     var statusImc = remember {
-        mutableStateOf("")
+        mutableStateOf("Informe seu peso e altura")
+    }
+
+    var corFundo = remember {
+        mutableStateOf(0xFF329F6B)
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -156,8 +163,8 @@ fun ImcScreen() {
                     )
 
                     OutlinedTextField(
-                        value = "",
-                        onValueChange = {},
+                        value = peso.value,
+                        onValueChange = {peso.value = it},
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 24.dp),
@@ -183,8 +190,8 @@ fun ImcScreen() {
                     )
 
                     OutlinedTextField(
-                        value = "",
-                        onValueChange = {},
+                        value = altura.value,
+                        onValueChange = {altura.value = it},
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 24.dp),
@@ -204,13 +211,25 @@ fun ImcScreen() {
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Button(
-                        onClick = {},
+                        onClick = {
+                                  imc.value = calcularIMC(
+                                      altura = altura.value.toDouble(),
+                                      peso =- peso.value.toDouble()
+                                  )
+
+                                //statusImc = determinarClassificacaoIMC(imc.value)
+                                statusImc = classifaIMC(imc.value)
+                                Log.i("statusIMC", statusImc.value)
+
+
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(48.dp)
                             .padding(horizontal = 24.dp),
                         shape = RoundedCornerShape(16.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.vermelho_fiap))
+                        colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.vermelho_fiap)),
+                        enabled = peso.value.isNotBlank() && altura.value.isNotBlank() // Verifica se ambos os campos estão preenchidos
                     ) {
                         Text(
                             text = "CALCULAR",
@@ -235,7 +254,7 @@ fun ImcScreen() {
                 .height(200.dp)
                 .padding(horizontal = 16.dp, vertical = 24.dp),
 
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF329F6B)),
+                colors = CardDefaults.cardColors(containerColor = aplicaCorDeFundo(imc.value)),
                 elevation = CardDefaults.cardElevation(4.dp)
             ) {
                 Row(
@@ -250,14 +269,15 @@ fun ImcScreen() {
                             color = Color.White,
                             fontSize = 14.sp
                         )
-                        Text(text = "Peso Ideal!",
+                        Text(text = statusImc.value,
                             fontWeight = FontWeight.Bold,
                             color = Color.White,
-                            fontSize = 20.sp
+                            fontSize = 18.sp,
+                            modifier = Modifier.heightIn(max = 80.dp).size(200.dp)
                         )
                     }
 
-                    Text(text = "23,2",
+                    Text(text = String.format("%.1f", imc.value),
                         modifier = Modifier.fillMaxWidth(),
                         color = Color.White,
                         fontSize = 36.sp,

@@ -8,6 +8,9 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="vermelho_fiap">#FFED145B</color>
+    <color name="amarelo_fiap">#FFFFEB3B</color>
+    <color name="laranja_fiap">#FFFF5722</color>
+    <color name="verde_fiap">#FF329F6B</color>
 
 
 </resources>
